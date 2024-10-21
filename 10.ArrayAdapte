@@ -1,0 +1,46 @@
+PROGRAM 10:
+Develop an application that uses ArrayAdapter with ListView
+CODE:
+activity_main.xml:
+------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+MainActivity.java:
+------------------------
+package com.example.arrayadapter;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle; import android.view.View;
+import android.widget.ListView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter; import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+    ListView l;
+    String tutorials[]
+            = { "Algorithms", "Data Structures",
+            "Languages","dbms","java","python"};
+    protected void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main); l = findViewById(R.id.list);
+        final ArrayAdapter<String> arr;
+        arr = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, tutorials);
+        l.setAdapter(arr);
+        l.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                String value = arr.getItem(position);
+                Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+            } }); }}
+
+output
+---------------------
+the output is given as the name10.ArrayAdapte.1
