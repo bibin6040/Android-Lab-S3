@@ -1,0 +1,186 @@
+PROGRAM 12
+Create database using SQLite and perform INSERT and SELECT
+CODE:
+activity_main.xml:
+------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name" />
+        <EditText
+            android:id="@+id/editTextAge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Age"
+
+            android:inputType="number" />
+        <EditText
+            android:id="@+id/editTextMark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mark"
+            android:inputType="number" />
+        <Button
+            android:id="@+id/buttonInsert"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Insert Data" />
+        <Button
+            android:id="@+id/buttonSelect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="select Data" />
+        <TextView
+            android:id="@+id/textViewData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="User Data:"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+MainActivity.java:
+------------------------------------
+package com.example.sqlite;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+    private DatabaseHelper db; // database name
+    private EditText editTextName, editTextAge, editTextMark;
+    private TextView textViewData;
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        db = new DatabaseHelper(this);
+        editTextName = findViewById(R.id.editTextName);
+        editTextAge = findViewById(R.id.editTextAge);
+        editTextMark = findViewById(R.id.editTextMark);
+        textViewData = findViewById(R.id.textViewData);
+        Button buttonInsert = findViewById(R.id.buttonInsert);
+        Button buttonSelect = findViewById(R.id.buttonSelect);
+        buttonInsert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String name = editTextName.getText().toString();
+                int age = Integer.parseInt(editTextAge.getText().toString());
+                int mark = Integer.parseInt(editTextMark.getText().toString());
+                boolean insertData = db.insertUser(name, age, mark); // insert data
+                if (insertData) {
+                    Toast.makeText(MainActivity.this, "User Inserted Successfully",
+                            Toast.LENGTH_SHORT).show();
+                    displayData();
+                } else {
+                    Toast.makeText(MainActivity.this, "Failed to Insert User",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        buttonSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayData();
+            }
+        });
+    }
+    //display data
+    private void displayData() {
+        Cursor cursor = db.getAllUsers();
+        if (cursor.getCount() == 0) {
+            textViewData.setText("No users found");
+        } else {
+            StringBuilder data = new StringBuilder();
+
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                int age = cursor.getInt(2);
+                int mark = cursor.getInt(3);
+                data.append("ID: ").append(id)
+                        .append(", Name: ").append(name)
+                        .append(", Age: ").append(age)
+                        .append(", Mark: ").append(mark)
+                        .append("\n");
+            }
+            textViewData.setText(data.toString());
+        }
+    }
+}
+
+DatabaseHelper.java
+----------------------------
+package com.example.sqlite;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+public class DatabaseHelper extends SQLiteOpenHelper{
+    private static final String DATABASE_NAME = "UserDatabase.db";
+    private static final String TABLE_NAME = "UserTable";
+    private static final String COL_1 = "ID";
+    private static final String COL_2 = "NAME";
+
+    private static final String COL_3 = "AGE";
+    private static final String COL_4 = "MARK";
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, 1);
+    }
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE " + TABLE_NAME + " (" +
+                COL_1 + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COL_2 + " TEXT," +
+                COL_3 + " INTEGER," +
+                COL_4 + " INTEGER)");
+    }
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+    public boolean insertUser(String name, int age, int mark) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_2, name);
+        contentValues.put(COL_3, age);
+        contentValues.put(COL_4, mark);
+        long result = db.insert(TABLE_NAME, null, contentValues);
+        return result != -1;
+    }
+
+    public Cursor getAllUsers() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+    }
+}
+
+output
+---------------------------
+it is given as 12.SQLite.1.1 and 1.2
+
+hoe to do
+-----------------------
+do the similar step as the all doing page in earlier programs and only one more is do is that 
+->take app from left side
+->then take java
+->then take com.example.sqlite
+->then inside that right click and take the java
+->then give name as DatabaseHelper
